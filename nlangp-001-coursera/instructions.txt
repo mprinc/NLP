@@ -1,14 +1,14 @@
 # map and replace rare words with _RARE_
-python src/nlpGeneTagger.py --phase preprocess --filein "other/hw1/input/gene.train.txt" --fileout "other/hw1/output/gene.train.txt"
+python src/nlpGeneTagger.py --phase preprocess_unigram --filein "other/hw1/input/gene.train.txt" --fileout "other/hw1/output/gene.train.unigram.txt"
 
 # find counts
-python other/hw1/input/count_freqs.py other/hw1/output/gene.train.txt > other/hw1/output/gene.counts.txt
+python other/hw1/input/count_freqs.py other/hw1/output/gene.train.unigram.txt > other/hw1/output/gene.counts.unigram.txt
 
 # tag
-python src/nlpGeneTagger.py --phase tag --filecounts "other/hw1/output/gene.counts.txt" --filein "other/hw1/input/gene.dev.txt" --fileout "other/hw1/output/gene.dev.out.txt"
+python src/nlpGeneTagger.py --phase tag_unigram --filecounts "other/hw1/output/gene.counts.unigram.txt" --filein "other/hw1/input/gene.dev.txt" --fileout "other/hw1/output/gene.dev.out.unigram.txt"
 
 # evaluate unigram tagger
-python other/hw1/input/eval_gene_tagger.py "other/hw1/input/gene.key.txt" "other/hw1/output/gene.dev.out.txt"
+python other/hw1/input/eval_gene_tagger.py "other/hw1/input/gene.key.txt" "other/hw1/output/gene.dev.out.unigram.txt"
 # EXPECTED:
 # Found 2669 GENEs. Expected 642 GENEs; Correct: 424.
 #          precision      recall          F1-Score
@@ -19,6 +19,68 @@ python other/hw1/input/eval_gene_tagger.py "other/hw1/input/gene.key.txt" "other
 # GENE:    0.183709       0.495327        0.268015
 
 # submit unigram tagger
-python src/nlpGeneTagger.py --phase tag --filecounts "other/hw1/output/gene.counts.txt" --filein "other/hw1/input/gene.test.txt" --fileout "other/hw1/output/gene.test.out.txt"
-cp "other/hw1/output/gene.test.out.txt" "gene_test.p1.out"
+python src/nlpGeneTagger.py --phase tag_unigram --filecounts "other/hw1/output/gene.counts.unigram.txt" --filein "other/hw1/input/gene.test.txt" --fileout "other/hw1/output/gene.test.out.unigram.txt"
+cp "other/hw1/output/gene.test.out.unigram.txt" "gene_test.p1.out"
+python other/hw1/input/submit.py
+
+### ====================================================================================================================
+
+# map and replace rare words with _RARE_ and beginning and end of sentence
+python src/nlpGeneTagger.py --phase preprocess_viterbi --filein "other/hw1/input/gene.train.txt" --fileout "other/hw1/output/gene.train.viterbi.txt"
+
+# find counts
+python other/hw1/input/count_freqs.py other/hw1/output/gene.train.viterbi.txt > other/hw1/output/gene.counts.viterbi.txt
+
+# tag
+python src/nlpGeneTagger.py --phase tag_viterbi --filecounts "other/hw1/output/gene.counts.viterbi.txt" --filein "other/hw1/input/gene.dev.txt" --fileout "other/hw1/output/gene.dev.out.viterbi.txt"
+
+# evaluate viterbi tagger
+python other/hw1/input/eval_gene_tagger.py "other/hw1/input/gene.key.txt" "other/hw1/output/gene.dev.out.viterbi.txt"
+# EXPECTED:
+
+# I GOT
+# Case insensitive (with bug: non replacing rare words)
+# Found 286 GENEs. Expected 642 GENEs; Correct: 167.
+#          precision      recall          F1-Score
+# GENE:    0.583916       0.260125        0.359914
+
+# Case sensitive (with bug: non replacing rare words)
+# Found 251 GENEs. Expected 642 GENEs; Correct: 157.
+#          precision      recall          F1-Score
+# GENE:    0.625498       0.244548        0.351624
+
+# Case insensitive (after fixing bug: non replacing rare words)
+# Found 450 GENEs. Expected 642 GENEs; Correct: 245.
+#          precision      recall          F1-Score
+# GENE:    0.544444       0.381620        0.448718
+
+# Case sensitive (after fixing bug: non replacing rare words)
+# Found 449 GENEs. Expected 642 GENEs; Correct: 255.
+#          precision      recall          F1-Score
+# GENE:    0.567929       0.397196        0.467461
+
+python src/nlpGeneTagger.py --phase tag_viterbi --filecounts "other/hw1/output/gene.counts.viterbi.txt" --filein "other/hw1/input/gene.test.txt" --fileout "other/hw1/output/gene.test.out.viterbi.txt"
+cp "other/hw1/output/gene.test.out.viterbi.txt" "gene_test.p2.out"
+python other/hw1/input/submit.py
+
+
+### ====================================================================================================================
+
+# map and replace rare words with rare classes (RARE_NUMERIC, RARE_CAPITALS, RARE_) and beginning and end of sentence
+python src/nlpGeneTagger.py --phase preprocess_viterbi_c --filein "other/hw1/input/gene.train.txt" --fileout "other/hw1/output/gene.train.viterbi_c.txt"
+
+# find counts
+python other/hw1/input/count_freqs.py other/hw1/output/gene.train.viterbi_c.txt > other/hw1/output/gene.counts.viterbi_c.txt
+
+# tag
+python src/nlpGeneTagger.py --phase tag_viterbi --filecounts "other/hw1/output/gene.counts.viterbi_c.txt" --filein "other/hw1/input/gene.dev.txt" --fileout "other/hw1/output/gene.dev.out.viterbi_c.txt"
+
+# evaluate viterbi tagger
+python other/hw1/input/eval_gene_tagger.py "other/hw1/input/gene.key.txt" "other/hw1/output/gene.dev.out.viterbi_c.txt"
+# EXPECTED:
+
+# I GOT
+
+python src/nlpGeneTagger.py --phase tag_viterbi --filecounts "other/hw1/output/gene.counts.viterbi_c.txt" --filein "other/hw1/input/gene.test.txt" --fileout "other/hw1/output/gene.test.out.viterbi_c.txt"
+cp "other/hw1/output/gene.test.out.viterbi_c.txt" "gene_test.p3.out"
 python other/hw1/input/submit.py

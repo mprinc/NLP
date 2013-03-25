@@ -66,7 +66,9 @@ def get_ngrams(sent_iterator, n):
     for sent in sent_iterator:
          #Add boundary symbols to the sentence
          w_boundary = (n-1) * [(None, "*")]
+         #print "Sentence start: "+str(sent)
          w_boundary.extend(sent)
+         #print "Sentence stop"
          w_boundary.append((None, "STOP"))
          #Then extract n-grams
          ngrams = (tuple(w_boundary[i:i+n]) for i in xrange(len(w_boundary)-n+1))
