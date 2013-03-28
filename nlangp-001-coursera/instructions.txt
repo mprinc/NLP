@@ -72,8 +72,21 @@ python src/nlpGeneTagger.py --phase preprocess_viterbi_c --filein "other/hw1/inp
 # find counts
 python other/hw1/input/count_freqs.py other/hw1/output/gene.train.viterbi_c.txt > other/hw1/output/gene.counts.viterbi_c.txt
 
+# https://class.coursera.org/nlangp-001/forum/thread?thread_id=518#post-2281
+# 23051 WORDTAG O _RARE_
+# 2797 WORDTAG I-GENE _RARE_
+
+# 3565 WORDTAG I-GENE _RARE_NUMERIC_
+# 2772 WORDTAG O _RARE_NUMERIC_
+
+# 1411 WORDTAG I-GENE _RARE_ALL_CAP_
+# 2698 WORDTAG O _RARE_ALL_CAP_
+
+# 260 WORDTAG O _RARE_LAST_CAP_
+# 959 WORDTAG I-GENE _RARE_LAST_CAP_
+
 # tag
-python src/nlpGeneTagger.py --phase tag_viterbi --filecounts "other/hw1/output/gene.counts.viterbi_c.txt" --filein "other/hw1/input/gene.dev.txt" --fileout "other/hw1/output/gene.dev.out.viterbi_c.txt"
+python src/nlpGeneTagger.py --phase tag_viterbi_c --filecounts "other/hw1/output/gene.counts.viterbi_c.txt" --filein "other/hw1/input/gene.dev.txt" --fileout "other/hw1/output/gene.dev.out.viterbi_c.txt"
 
 # evaluate viterbi tagger
 python other/hw1/input/eval_gene_tagger.py "other/hw1/input/gene.key.txt" "other/hw1/output/gene.dev.out.viterbi_c.txt"
@@ -81,6 +94,11 @@ python other/hw1/input/eval_gene_tagger.py "other/hw1/input/gene.key.txt" "other
 
 # I GOT
 
-python src/nlpGeneTagger.py --phase tag_viterbi --filecounts "other/hw1/output/gene.counts.viterbi_c.txt" --filein "other/hw1/input/gene.test.txt" --fileout "other/hw1/output/gene.test.out.viterbi_c.txt"
+python src/nlpGeneTagger.py --phase tag_viterbi_c --filecounts "other/hw1/output/gene.counts.viterbi_c.txt" --filein "other/hw1/input/gene.test.txt" --fileout "other/hw1/output/gene.test.out.viterbi_c.txt"
 cp "other/hw1/output/gene.test.out.viterbi_c.txt" "gene_test.p3.out"
 python other/hw1/input/submit.py
+
+python src/nlpGeneTagger.py --phase preprocess_viterbi_c --filein "other/hw1/input/gene.train.txt" --fileout "other/hw1/output/gene.train.viterbi_c.txt"
+python other/hw1/input/count_freqs.py other/hw1/output/gene.train.viterbi_c.txt > other/hw1/output/gene.counts.viterbi_c.txt
+python src/nlpGeneTagger.py --phase tag_viterbi_c --filecounts "other/hw1/output/gene.counts.viterbi_c.txt" --filein "other/hw1/input/gene.dev.txt" --fileout "other/hw1/output/gene.dev.out.viterbi_c.txt"
+python other/hw1/input/eval_gene_tagger.py "other/hw1/input/gene.key.txt" "other/hw1/output/gene.dev.out.viterbi_c.txt"

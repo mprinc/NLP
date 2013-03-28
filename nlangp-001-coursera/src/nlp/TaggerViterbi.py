@@ -28,7 +28,7 @@ class TaggerViterbi(object):
         
         print "Calculating Emissions parameters for unigram tagger finished ..."
     
-    def tag(self, filenameIn, filenameOut):
+    def tag(self, filenameIn, filenameOut, withClassess):
         self.filenameIn = filenameIn
         self.filenameOut = filenameOut
         print "Tagging with Viterbi Algoirithm started ..."
@@ -47,7 +47,7 @@ class TaggerViterbi(object):
             
         wordsNo = 0
         
-        rex_word = re.compile(r'^\s*(\S+)$') # <word_orig>
+        rex_word = re.compile(r'^\s*(\S+)\s*$') # <word_orig>
         newSentence = True;
         for line in self.fileIn:
             wordsNo=wordsNo+1;
@@ -67,10 +67,15 @@ class TaggerViterbi(object):
                 word_final = TaggingPreprocessing.WordNormalize(word_orig);
                 if(not self.taggingCountsUnigram.wordsHash.has_key(word_final)):
                     #print "Word " + word_orig + " -> " + TaggingPreprocessing.RARE;
-                    word_final = TaggingPreprocessing.RARE_WORD;
-
+                    if(not withClassess):
+                        word_final = TaggingPreprocessing.RARE_WORD;
+                    else:
+                        word_final = TaggingPreprocessing.getRareWordClass(word_final);
             else:
                 word_orig = line;
+                if(word_orig.rstrip("\r\n") != ""):
+                    print("not empty line");
+                    exit(1);
                 word_final = TaggingCountsViterbi.WORD_STOP_CHECK;
                 isLastWordInSentence = True;
 
