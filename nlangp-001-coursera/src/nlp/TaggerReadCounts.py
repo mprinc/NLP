@@ -7,7 +7,7 @@ import re
 from TaggingCountsUnigram import TaggingCountsUnigram
 from TaggingPreprocessing import TaggingPreprocessing
 
-class ReadCounts(object):
+class TaggerReadCounts(object):
     def __init__(self):
         self.filenameIn = "";
         self.taggingCountsUnigram = TaggingCountsUnigram();
@@ -49,7 +49,7 @@ class ReadCounts(object):
                 var_count = match.group(1)
                 var_tag_1 = match.group(2)
                 #print "Unigram: count:" + var_count + ", tag_1: " + var_tag_1
-                self.taggingCountsUnigram.unigramsCount[var_tag_1] = int(var_count);
+                self.taggingCountsUnigram.nonterminalsCount[var_tag_1] = int(var_count);
                 continue
 
             match = rex_bigram.search(line)
@@ -68,7 +68,7 @@ class ReadCounts(object):
                 var_tag_2 = match.group(3);
                 var_tag_3 = match.group(4);
                 #print "Trigram: count:" + var_count + ", tag_1: " + var_tag_1 + ", tag_2: " + var_tag_2 + ", tag_3: " + var_tag_3;
-                self.taggingCountsUnigram.trigramsCount[var_tag_1][var_tag_2][var_tag_3] = int(var_count);
+                self.taggingCountsUnigram.binaryRulesCount[var_tag_1][var_tag_2][var_tag_3] = int(var_count);
                 continue
 
             if not match:
@@ -78,6 +78,6 @@ class ReadCounts(object):
         self.taggingCountsUnigram.tags = self.taggingCountsUnigram.tagssHash.keys();
         self.taggingCountsUnigram.words = self.taggingCountsUnigram.wordsHash.keys();
         print "Tags: " + str(self.taggingCountsUnigram.tags);
-        print "Search trigram['O']['O']['I-GENE']: " + str(self.taggingCountsUnigram.trigramsCount['O']['O']['I-GENE']);
+        print "Search trigram['O']['O']['I-GENE']: " + str(self.taggingCountsUnigram.binaryRulesCount['O']['O']['I-GENE']);
 
     

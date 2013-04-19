@@ -1,2 +1,5 @@
-__all__ = ['ReadCounts.py','EmissionParameters.py', 'TaggingCountsUnigram.py', 'TaggingCountsViterbi.py',
-           'TaggingPreprocessing.py', 'TaggerUnigram.py', 'TaggerViterbi.py']
+__all__ = ['TaggerReadCounts.py','EmissionParameters.py', 'TaggingCountsUnigram.py', 'TaggingCountsViterbi.py',
+           'TaggingPreprocessing.py', 'TaggerUnigram.py', 'TaggerViterbi.py',
+           # sub-folders
+           'parser'
+           ]

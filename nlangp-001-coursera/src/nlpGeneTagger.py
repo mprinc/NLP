@@ -8,7 +8,7 @@ import argparse
 from nlp.TaggingPreprocessing import TaggingPreprocessing
 from nlp.TaggingCountsUnigram import TaggingCountsUnigram
 from nlp.TaggingCountsViterbi import TaggingCountsViterbi
-from nlp.ReadCounts import ReadCounts
+from nlp.ReadCounts import TaggerReadCounts
 from nlp.TaggerUnigram import TaggerUnigram
 from nlp.TaggerViterbi import TaggerViterbi
 
@@ -94,10 +94,10 @@ if(args.phase == 'tag_unigram'):
         exit(0);
         
     taggingCountsUnigram = TaggingCountsUnigram()
-    reader = ReadCounts();
+    countsReader = TaggerReadCounts();
     taggerUnigram = TaggerUnigram()
 
-    reader.load(args.filecounts, taggingCountsUnigram);
+    countsReader.load(args.filecounts, taggingCountsUnigram);
     taggerUnigram.getEmissionParameters(taggingCountsUnigram);
     taggerUnigram.tag(args.filein, args.fileout);    
 
@@ -116,11 +116,11 @@ if(args.phase == 'tag_viterbi'):
         
     taggingCountsUnigram = TaggingCountsUnigram();
     taggingCountsViterbi = TaggingCountsViterbi(taggingCountsUnigram);
-    reader = ReadCounts();
+    countsReader = TaggerReadCounts();
     taggerUnigram = TaggerUnigram();
     taggerViterbi = TaggerViterbi();
 
-    reader.load(args.filecounts, taggingCountsUnigram);
+    countsReader.load(args.filecounts, taggingCountsUnigram);
     
     taggerUnigram.getEmissionParameters(taggingCountsUnigram);
     taggingCountsViterbi.calculateTagsSet();
@@ -143,11 +143,11 @@ if(args.phase == 'tag_viterbi_c'):
         
     taggingCountsUnigram = TaggingCountsUnigram();
     taggingCountsViterbi = TaggingCountsViterbi(taggingCountsUnigram);
-    reader = ReadCounts();
+    countsReader = TaggerReadCounts();
     taggerUnigram = TaggerUnigram();
     taggerViterbi = TaggerViterbi();
 
-    reader.load(args.filecounts, taggingCountsUnigram);
+    countsReader.load(args.filecounts, taggingCountsUnigram);
     
     taggerUnigram.getEmissionParameters(taggingCountsUnigram);
     taggingCountsViterbi.calculateTagsSet();

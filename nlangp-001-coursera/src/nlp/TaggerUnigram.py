@@ -20,14 +20,14 @@ class TaggerUnigram(object):
             for tag in self.taggingCountsUnigram.wordTagCount[word].keys():
                 if(len(self.taggingCountsUnigram.wordTagCount[word].keys()) > 1):
                     print "word/tagUnigram: " + word + "/" + tag;
-                    print "getEmissionParametersUnigram: " + str(self.taggingCountsUnigram.wordTagCount[word][tag]) + ", " + str(self.taggingCountsUnigram.unigramsCount[tag]);
-                self.taggingCountsUnigram.emissionCount[word][tag] = self.taggingCountsUnigram.wordTagCount[word][tag] / self.taggingCountsUnigram.unigramsCount[tag];
+                    print "getEmissionParametersUnigram: " + str(self.taggingCountsUnigram.wordTagCount[word][tag]) + ", " + str(self.taggingCountsUnigram.nonterminalsCount[tag]);
+                self.taggingCountsUnigram.emissionCount[word][tag] = self.taggingCountsUnigram.wordTagCount[word][tag] / self.taggingCountsUnigram.nonterminalsCount[tag];
                 if(emissionMax < self.taggingCountsUnigram.emissionCount[word][tag]):
                     self.taggingCountsUnigram.emissionCountMax[word] = tag;
                     emissionMax = self.taggingCountsUnigram.emissionCount[word][tag];
                     #if(len(self.taggingCountsUnigram.wordTagCount[word].keys()) > 1):
                     #    print "...This is max";
-                #print "getEmissionParametersUnigram: " + str(self.taggingCountsUnigram.wordTagCount[word][tagUnigram] / self.taggingCountsUnigram.unigramsCount[tagUnigram]);
+                #print "getEmissionParametersUnigram: " + str(self.taggingCountsUnigram.wordTagCount[word][tagUnigram] / self.taggingCountsUnigram.nonterminalsCount[tagUnigram]);
         print "Calculating Emissions parameters for unigram tagger finished ..."
     
     def tag(self, filenameIn, filenameOut):

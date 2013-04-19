@@ -73,6 +73,7 @@ python src/nlpGeneTagger.py --phase preprocess_viterbi_c --filein "other/hw1/inp
 python other/hw1/input/count_freqs.py other/hw1/output/gene.train.viterbi_c.txt > other/hw1/output/gene.counts.viterbi_c.txt
 
 # https://class.coursera.org/nlangp-001/forum/thread?thread_id=518#post-2281
+# https://class.coursera.org/nlangp-001/forum/thread?thread_id=310#post-1641
 # 23051 WORDTAG O _RARE_
 # 2797 WORDTAG I-GENE _RARE_
 
