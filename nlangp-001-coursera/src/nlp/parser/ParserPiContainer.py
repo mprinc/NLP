@@ -5,6 +5,12 @@ import sys;
 import re;
 import json;
 
+# TODO: Check about __getitem__ method
+# If i do:
+#     p = ParserPiContainer();
+#     p[0] = 5;
+# python should report: TypeError: 'ParserPiContainer' object has no attribute '__getitem__'
+
 from collections import defaultdict;
 
 class ParserPiContainer(object):

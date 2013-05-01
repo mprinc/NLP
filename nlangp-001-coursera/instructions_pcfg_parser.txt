@@ -59,4 +59,21 @@ python src/nlpPcfgParser.py --phase cky --filecounts "other/hw2/output/cfg.count
 cp "other/hw2/output/parse_test.dat.out.cky.json" "parse_test.p2.out"
 python other/hw2/scripts/submit.py
 
+
+Part 3
 ### ====================================================================================================================
+
+python src/nlpPcfgParser.py --phase preprocess_rare --filein "other/hw2/input/parse_train_vert.dat.json" --fileout "other/hw2/output/parse_train_vert.dat.rare.json"
+
+python other/hw2/scripts/count_cfg_freqs.py other/hw2/output/parse_train_vert.dat.rare.json > other/hw2/output/cfg.counts_vert.rare.txt
+
+# parse makrov
+parse_train_vert.dat.json
+python src/nlpPcfgParser.py --phase cky --filecounts "other/hw2/output/cfg.counts_vert.rare.txt" --filein "other/hw2/input/parse_test.dat.txt" --fileout "other/hw2/output/parse_test_vert.dat.out.cky.json"
+
+
+# submit parser
+cp "other/hw2/output/parse_test_vert.dat.out.cky.json" "parse_test.p3.out"
+python other/hw2/scripts/submit.py
+
+
