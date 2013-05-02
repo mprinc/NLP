@@ -3,23 +3,25 @@ cd /Users/mprinc/Documents/data/development/NLP/nlangp-001-coursera
 # =============================================
 # The expected development F-Scores are 0.420, 0.449, and a basic intersection alignment should give 0.485 for the last part.
 # =============================================
+
+# Part 1
 # =============================================
 
 # trainIBM1 (dev)
 python src/nlpMachineTranslator.py --phase trainIBM1 --fileLang1in "other/hw3/input/corpus_s.es.txt"  --fileLang2in "other/hw3/input/corpus_s.en.txt" --fileout "other/hw3/output/params_s_t.key.txt"
 
 # trainIBM1
-python src/nlpMachineTranslator.py --phase trainIBM1 --fileLang1in "other/hw3/input/corpus.es.txt"  --fileLang2in "other/hw3/input/corpus.en.txt" --fileout "other/hw3/output/params_s.key.txt"
+python src/nlpMachineTranslator.py --phase trainIBM1 --fileLang1in "other/hw3/input/corpus.es.txt"  --fileLang2in "other/hw3/input/corpus.en.txt" --fileout "other/hw3/output/params_t.key.txt"
 
 # alignIBM1 dev
-python src/nlpMachineTranslator.py --phase alignIBM1 --fileLang1in "other/hw3/input/dev.es.txt"  --fileLang2in "other/hw3/input/dev.en.txt" --fileparams "other/hw3/output/params_s.key.txt" \
+python src/nlpMachineTranslator.py --phase alignIBM1 --fileLang1in "other/hw3/input/dev.es.txt"  --fileLang2in "other/hw3/input/dev.en.txt" --fileparams "other/hw3/output/params_t.key.txt" \
     --fileout "other/hw3/output/dev.align.txt"
 
 # evaluate dev
 python other/hw3/scripts/eval_alignment.py other/hw3/input/dev.key.txt "other/hw3/output/dev.align.txt"
 
 # alignIBM1 test
-python src/nlpMachineTranslator.py --phase alignIBM1 --fileLang1in "other/hw3/input/test.es.txt"  --fileLang2in "other/hw3/input/test.en.txt" --fileparams "other/hw3/output/params_s.key.txt" \
+python src/nlpMachineTranslator.py --phase alignIBM1 --fileLang1in "other/hw3/input/test.es.txt"  --fileLang2in "other/hw3/input/test.en.txt" --fileparams "other/hw3/output/params_t.key.txt" \
     --fileout "other/hw3/output/test.align.txt"
 
 # submit parser
@@ -27,20 +29,30 @@ cp "other/hw3/output/test.align.txt" "alignment_test.p1.out"
 python other/hw3/scripts/submit.py
 
 
-Part 3
-### ====================================================================================================================
+# Part 2
+# =============================================
 
-python src/nlpMachineTranslator.py --phase preprocess_rare --filein "other/hw3/input/parse_train_vert.dat.json" --fileout "other/hw3/output/parse_train_vert.dat.rare.json"
+# trainIBM2 (dev)
+python src/nlpMachineTranslator.py --phase trainIBM2 --fileLang1in "other/hw3/input/corpus_s.es.txt"  --fileLang2in "other/hw3/input/corpus_s.en.txt" --fileparams "other/hw3/output/params_s_t.key.txt" \
+    --fileout "other/hw3/output/params_s_q.key.txt"
 
-python other/hw3/scripts/count_cfg_freqs.py other/hw3/output/parse_train_vert.dat.rare.json > other/hw3/output/cfg.counts_vert.rare.txt
+# trainIBM2
+python src/nlpMachineTranslator.py --phase trainIBM2 --fileLang1in "other/hw3/input/corpus.es.txt"  --fileLang2in "other/hw3/input/corpus.en.txt" --fileparams "other/hw3/output/params_t.key.txt" \
+    --fileout "other/hw3/output/params_q.key.txt"
 
-# parse makrov
-parse_train_vert.dat.json
-python src/nlpMachineTranslator.py --phase cky --filecounts "other/hw3/output/cfg.counts_vert.rare.txt" --filein "other/hw3/input/parse_test.dat.txt" --fileout "other/hw3/output/parse_test_vert.dat.out.cky.json"
+# alignIBM2 dev
+python src/nlpMachineTranslator.py --phase alignIBM2 --fileLang1in "other/hw3/input/dev.es.txt"  --fileLang2in "other/hw3/input/dev.en.txt" --fileparams "other/hw3/output/params_t.key.txt" \
+     --fileparams2 "other/hw3/output/params_q.key.txt"  --fileout "other/hw3/output/dev.align.ibm2.txt"
 
+# evaluate dev
+python other/hw3/scripts/eval_alignment.py other/hw3/input/dev.key.txt "other/hw3/output/dev.align.ibm2.txt"
+
+# alignIBM2 test
+python src/nlpMachineTranslator.py --phase alignIBM2 --fileLang1in "other/hw3/input/test.es.txt"  --fileLang2in "other/hw3/input/test.en.txt" --fileparams "other/hw3/output/params_t.key.txt" \
+    --fileparams2 "other/hw3/output/params_q.key.txt"  --fileout "other/hw3/output/test.align.ibm2.txt"
 
 # submit parser
-cp "other/hw3/output/parse_test_vert.dat.out.cky.json" "parse_test.p3.out"
+cp "other/hw3/output/test.align.ibm2.txt" "alignment_test.p2.out"
 python other/hw3/scripts/submit.py
 
 

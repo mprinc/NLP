@@ -16,6 +16,7 @@ parser.add_argument('--fileLang1in', '-finL1', action='store',help='Input file n
 parser.add_argument('--fileLang2in', '-finL2', action='store',help='Second Input file name');
 parser.add_argument('--fileinAlignIn', '-finAlign', action='store',help='Second Input file name');
 parser.add_argument('--fileparams', '-fparams', action='store',help='Params file name');
+parser.add_argument('--fileparams2', '-fparams2', action='store',help='Params file name');
 parser.add_argument('--fileout', '-fout', action='store',help='Output file name');
 args = parser.parse_args();
 
@@ -84,6 +85,74 @@ if(args.phase == 'alignIBM1'):
 
     print("Training finished");
 
+
+if(args.phase == 'trainIBM2'):
+    if(not args.fileLang1in):
+        print "ERROR: You should provide --fileLang1in parameter\n";
+        exit(0);
+
+    if(not args.fileLang2in):
+        print "ERROR: You should provide --fileLang2in parameter\n";
+        exit(0);
+
+    if(not args.fileparams):
+        print "ERROR: You should provide --fileparams parameter\n";
+        exit(0);
+
+    if(not args.fileout):
+        print "ERROR: You should provide --fileout parameter\n";
+        exit(0);
+    print("Training started");
+    filesManagement1 = FilesManagement();
+    filesManagement1.load(args.fileLang1in);
+
+    filesManagement2 = FilesManagement();
+    filesManagement2.load(args.fileLang2in);
+    
+    trainer = TranslatorTrainer();
+    trainer.trainIBM2(filesManagement1, filesManagement2, args.fileparams);
+    trainer.saveParamsIBM2(args.fileout);
+    trainer.loadParamsIBM2(args.fileout);
+
+    #filesManagement1.save(args.fileout);
+    #filesManagement2.save(args.fileout);
+    
+    print("Training finished");
+
+if(args.phase == 'alignIBM2'):
+    if(not args.fileLang1in):
+        print "ERROR: You should provide --fileLang1in parameter\n";
+        exit(0);
+
+    if(not args.fileLang2in):
+        print "ERROR: You should provide --fileLang2in parameter\n";
+        exit(0);
+
+    if(not args.fileparams):
+        print "ERROR: You should provide --fileparams parameter\n";
+        exit(0);
+
+    if(not args.fileparams2):
+        print "ERROR: You should provide --fileparams2 parameter\n";
+        exit(0);
+
+    if(not args.fileout):
+        print "ERROR: You should provide --fileout parameter\n";
+        exit(0);
+    print("Training started");
+    
+    filesManagement1 = FilesManagement();
+    filesManagement1.load(args.fileLang1in);
+
+    filesManagement2 = FilesManagement();
+    filesManagement2.load(args.fileLang2in);
+    
+    trainer = TranslatorTrainer();
+    trainer.loadParamsIBM1(args.fileparams);
+    trainer.loadParamsIBM2(args.fileparams2);
+    trainer.alignAndSaveIBM2(filesManagement1, filesManagement2, args.fileout);
+
+    print("Training finished");
 
 print("Machine Translating finished");
 exit(0);

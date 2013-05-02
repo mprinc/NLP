@@ -29,13 +29,23 @@ class TranslatorTrainer(object):
         self.filesManagement1 = FilesManagement();
         self.filesManagement2 = FilesManagement();
         
+        # IBM 1
         # If word1 is a word from the first language, and word2 is a word from the second language then we have the following organization        
         self.t = TranslatorTContainer.defaultTree();    # self.t[word1][word2]
         self.c1 = TranslatorTContainer.defaultTree();   # self.c1[word2]
         self.c2 = TranslatorTContainer.defaultTree();   # self.c2[word2][word1]
 
+        # IBM 2
+        self.q = TranslatorTContainer.defaultTree();    # self.q[j][i][l][m]
+        self.c3 = TranslatorTContainer.defaultTree();   # self.c3[i][l][m]
+        self.c4 = TranslatorTContainer.defaultTree();   # self.c4[j][i][l][m]
+
         self.wordsCount = defaultTree();
 
+    # ===================================================================================================================
+    # IBM 1
+    # ===================================================================================================================
+    
     def trainIBM1(self, filesManagement1, filesManagement2):
         self.filesManagement1 = filesManagement1;
         self.filesManagement2 = filesManagement2;
@@ -163,7 +173,7 @@ class TranslatorTrainer(object):
         
         print("Loading params started ...");
 
-        print("\tLoading T params started ...");
+        print("\tLoading T params started (%s)..." % (self.filenameParams));
         self.t = TranslatorTContainer.defaultTree();
 
         try:
@@ -219,3 +229,221 @@ class TranslatorTrainer(object):
         print("\tSaving T params finished ...");
 
         print("Saving params finished ...");
+
+    # ===================================================================================================================
+    # IBM 2
+    # ===================================================================================================================
+    
+
+    # self.q = TranslatorTContainer.defaultTree();    # self.q[j][i][l][m]
+    # self.c3 = TranslatorTContainer.defaultTree();   # self.c3[i][l][m]
+    # self.c4 = TranslatorTContainer.defaultTree();   # self.c4[j][i][l][m]
+
+    def trainIBM2(self, filesManagement1, filesManagement2, fileparams):
+        self.filesManagement1 = filesManagement1;
+        self.filesManagement2 = filesManagement2;
+        self.fileparams = fileparams;
+        self.t = TranslatorTContainer.defaultTree();
+        self.q = TranslatorTContainer.defaultTree();
+        
+        print("IBM2 Training started ...");
+        
+        # load T params
+        self.loadParamsIBM1(self.fileparams);
+
+        self.initializeIBM2();
+        for i in xrange(5):
+            print("Running %d-th iteration" % (i+1));
+            self.iterateIBM2();
+            
+        print("IBM2 Training finished ...");
+        
+    def initializeIBM2(self):
+        print("IBM2 Initialization started ...");
+        sentenceNo = 0
+        # http://docs.python.org/2/library/re.html
+        
+        # 1 is added for NULL word
+        words2No = len(self.filesManagement2.wordsCount.keys()) + 1;
+        print("1/words2No = %e" % (1/words2No));
+        for sentenceNo in xrange(len(self.filesManagement1.sentences)):
+            sys.stdout.write("\rsentence %d" % (sentenceNo));
+            sentence1 = self.filesManagement1.sentences[sentenceNo];
+            sentence2 = self.filesManagement2.sentencesNulled[sentenceNo];
+            m = len(sentence1);
+            l = len(sentence2)-1; # neutralize NULL
+            for i in xrange(m):
+                for j in xrange(l+1):
+                    # T params are already loaded
+                    # self.t[word1][word2] = 1/words2No;
+                    self.q[j][i][l][m] = 1/(l+1);
+        print("");
+
+        # debug
+        self.insightParamsQ(2, 3, 3, 3)
+        print("IBM2 Initialization finished ...");
+        
+    def insightParamsQ(self, jCount, iCount, lCount, mCount):
+        print("Insigt on Q params ...");
+        for j in xrange(jCount):
+            if(not self.q.has_key(j)): continue
+            for i in xrange(iCount):
+                if(not self.q[j].has_key(j)): continue
+                for l in xrange(lCount):
+                    if(not self.q[j][i].has_key(l)): continue
+                    for m in xrange(mCount):
+                        if(not self.q[j][i][l].has_key(m)): continue
+                        val = self.q[j][i][l][m];
+                        print("\tq[%d,%d,%d,%d] = %e" % (j, i, l, m, val));
+        
+    def iterateIBM2(self):
+        print("IBM2 Iteration started ...");
+        self.c3 = TranslatorTContainer.defaultTree();
+        self.c4 = TranslatorTContainer.defaultTree();
+        
+        # clear Cs
+        print("\tClearing C parameters ...");
+        for sentenceNo in xrange(len(self.filesManagement1.sentences)):
+            sys.stdout.write("\rsentence %d" % (sentenceNo));
+            sentence1 = self.filesManagement1.sentences[sentenceNo];
+            sentence2 = self.filesManagement2.sentencesNulled[sentenceNo];
+            m = len(sentence1);
+            l = len(sentence2)-1; # neutralize NULL
+            for i in xrange(m):
+                for j in xrange(l+1):
+                    self.c3[i][l][m] = 0;
+                    self.c4[j][i][l][m] = 0;
+        print("");
+
+        # updating Cs
+        print("\tUpdating C parameters ...");
+        for sentenceNo in xrange(len(self.filesManagement1.sentences)):
+            sys.stdout.write("\rsentence %d" % (sentenceNo));
+            sentence1 = self.filesManagement1.sentences[sentenceNo];
+            sentence2 = self.filesManagement2.sentencesNulled[sentenceNo];
+            m = len(sentence1);
+            l = len(sentence2)-1; # neutralize NULL
+            for i in xrange(m):
+                deltaDiv = 0;
+                for j in xrange(l+1):
+                    #if(not self.t.has_key(sentence1[i]) or not self.t[sentence1[i]].has_key(sentence2[j])):
+                    #    print("deltaDiv: Missing T value (word1:%s, word2:%s)" % ( sentence1[i], sentence2[j] ))
+                    deltaDiv += self.q[j][i][l][m] * self.t[sentence1[i]][sentence2[j]]; 
+
+                for j in xrange(l+1):
+                    #if(not self.t.has_key(sentence1[i]) or not self.t[sentence1[i]].has_key(sentence2[j])):
+                    #    print("delta: Missing T value (word1:%s, word2:%s)" % ( sentence1[i], sentence2[j] ))
+                    delta = ( self.q[j][i][l][m] * self.t ) / deltaDiv;
+                    self.c3[i][l][m] += delta;
+                    self.c4[j][i][l][m] += delta;
+        print("");
+
+        # updating Qs
+        print("\tUpdating Q parameters ...");
+        for sentenceNo in xrange(len(self.filesManagement1.sentences)):
+            sys.stdout.write("\rsentence %d" % (sentenceNo));
+            sentence1 = self.filesManagement1.sentences[sentenceNo];
+            sentence2 = self.filesManagement2.sentencesNulled[sentenceNo];
+            m = len(sentence1);
+            l = len(sentence2)-1; # neutralize NULL
+            for i in xrange(m):
+                for j in xrange(l+1):
+                    self.q[j][i][l][m] = self.c4[j][i][l][m] / self.c3[i][l][m];
+        print("");
+
+        # debug
+        self.insightParamsQ(2, 3, 3, 3);
+
+        print("IBM2 Iteration finished ...");
+
+    def alignAndSaveIBM2(self, filesManagement1, filesManagement2, fileout):
+        self.filesManagement1 = filesManagement1;
+        self.filesManagement2 = filesManagement2;
+        self.fileout = fileout;
+
+        print("IBM2 Aligning and saving started ...");
+        
+        try:
+            self.file = codecs.open(self.fileout, encoding="utf-8", mode="w")
+        except Exception:
+            print("%s: %s, %s: %s" %(self.__class__.__name__, "storing T params", "Error accessing storage file", self.fileout))
+            sys.exit(1)
+            
+        for sentenceNo in xrange(len(self.filesManagement1.sentences)):
+            sys.stdout.write("\rsentence %d" % (sentenceNo));
+            sentence1 = self.filesManagement1.sentences[sentenceNo];
+            sentence2 = self.filesManagement2.sentencesNulled[sentenceNo];
+            m = len(sentence1);
+            l = len(sentence2)-1; # neutralize NULL
+            for i in xrange(m):
+                aMaxVal = 0;
+                aMaxIndex = 0;
+                for j in xrange(l+1):
+                    a = self.q[j][i][l][m] * self.t[sentence1[i]][sentence2[j]];
+                    if(a > aMaxVal):
+                        aMaxVal = a;
+                        aMaxIndex = j;
+                self.file.write(" %d %d %d\n" % ((sentenceNo+1), aMaxIndex, (i+1)));
+        print("");
+
+        self.file.close();
+                
+
+        print("IBM2 Aligning and saving finished ...");
+        
+    def loadParamsIBM2(self, filenameParams):
+        self.filenameParams = filenameParams;
+
+        
+        print("IBM2 Loading params started ...");
+
+        print("\tLoading Q params started (%s)..." % (self.filenameParams));
+        self.q = TranslatorTContainer.defaultTree();
+
+        try:
+            self.file = codecs.open(self.filenameParams, encoding="utf-8", mode="r")
+        except Exception:
+            print("%s: %s, %s: %s" %(self.__class__.__name__, "storing T params", "Error accessing storage file", self.filenameParams))
+            sys.exit(1)
+            
+
+        lineNo = 0
+        # http://docs.python.org/2/library/re.html
+        
+        for line in self.file:
+            lineNo=lineNo+1;
+            
+            (j, i, l, m, val) = line.split();
+            self.q[int(j)][int(i)][int(l)][int(m)] = float(val);
+
+        self.file.close();
+
+        print("\tLoading Q params finished ...");
+        # debug
+        self.insightParamsQ(2, 3, 3, 3);
+
+
+        print("IBM2 Loading params finished ...");
+                
+    def saveParamsIBM2(self, filenameParams):
+        self.filenameParams = filenameParams;
+        print("IBM2 Saving params started ...");
+
+        print("\tSaving Q params started ...");
+
+        try:
+            self.file = codecs.open(self.filenameParams, encoding="utf-8", mode="w")
+        except Exception:
+            print("%s: %s, %s: %s" %(self.__class__.__name__, "storing T params", "Error accessing storage file", self.filenameParams))
+            sys.exit(1)
+            
+        for j, hash2 in self.q.items():
+            for i, hash3 in hash2.items():
+                for l, hash4 in hash3.items():
+                    for m, qVal in hash4.items():
+                        self.file.write("%d %d %d %d %e\n" % (j, i, l, m, qVal));
+
+        self.file.close();
+        print("\tSaving Q params finished ...");
+
+        print("IBM2 Saving params finished ...");
