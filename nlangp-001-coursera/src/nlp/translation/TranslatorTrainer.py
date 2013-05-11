@@ -264,8 +264,6 @@ class TranslatorTrainer(object):
         # http://docs.python.org/2/library/re.html
         
         # 1 is added for NULL word
-        words2No = len(self.filesManagement2.wordsCount.keys()) + 1;
-        print("1/words2No = %e" % (1/words2No));
         for sentenceNo in xrange(len(self.filesManagement1.sentences)):
             sys.stdout.write("\rsentence %d" % (sentenceNo));
             sentence1 = self.filesManagement1.sentences[sentenceNo];
